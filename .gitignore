@@ -1,0 +1,44 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.env
+.env.*
+!.env.example
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+venv/
+.env/
+.logs/
+*.log
+logs/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+*.db
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+prometheus_multiproc_dir/
+
+# Local credentials and connection details
+API_INFO.txt
+ngrok.yml
+
+# Downloaded third-party binaries
+ngrok.exe
+
+# Machine-specific local launch scripts (may contain local paths/credentials)
+start.bat
+start-watchdog.ps1
+
+# Local IDE/editor settings
+.vscode/
+.idea/

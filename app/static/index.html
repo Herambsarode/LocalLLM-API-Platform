@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI API Dashboard</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+.container { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+h1 { font-size: 1.5rem; color: #f8fafc; display: flex; align-items: center; gap: 0.5rem; }
+h2 { font-size: 1rem; color: #94a3b8; font-weight: 400; }
+.card { background: #1e293b; border-radius: 10px; padding: 1.25rem; border: 1px solid #334155; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; }
+.stat { text-align: center; padding: 1rem; background: #0f172a; border-radius: 8px; }
+.stat-value { font-size: 1.8rem; font-weight: 700; color: #3b82f6; }
+.stat-label { font-size: 0.8rem; color: #64748b; margin-top: 0.25rem; }
+.stat-green .stat-value { color: #22c55e; }
+.stat-yellow .stat-value { color: #eab308; }
+input, select, textarea { width: 100%; padding: 0.6rem; background: #0f172a; border: 1px solid #334155; border-radius: 6px; color: #e2e8f0; font-size: 0.9rem; }
+input:focus, textarea:focus { outline: none; border-color: #3b82f6; }
+button { padding: 0.5rem 1rem; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 500; transition: 0.2s; }
+.btn-primary { background: #3b82f6; color: white; }
+.btn-primary:hover { background: #2563eb; }
+.btn-danger { background: #ef4444; color: white; }
+.btn-success { background: #22c55e; color: white; }
+.btn-sm { padding: 0.3rem 0.7rem; font-size: 0.8rem; }
+.btn-outline { background: transparent; border: 1px solid #334155; color: #94a3b8; }
+.flex { display: flex; gap: 0.5rem; align-items: center; }
+.flex-wrap { flex-wrap: wrap; }
+.justify-between { justify-content: space-between; }
+.grow { flex-grow: 1; }
+.hidden { display: none; }
+.text-sm { font-size: 0.85rem; }
+.text-xs { font-size: 0.75rem; }
+.text-muted { color: #64748b; }
+.text-green { color: #22c55e; }
+.text-red { color: #ef4444; }
+.text-blue { color: #3b82f6; }
+.text-yellow { color: #eab308; }
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.tabs { display: flex; gap: 0; border-bottom: 1px solid #334155; margin-bottom: 1rem; }
+.tab { padding: 0.6rem 1.2rem; cursor: pointer; color: #64748b; border-bottom: 2px solid transparent; font-size: 0.9rem; }
+.tab:hover { color: #94a3b8; }
+.tab.active { color: #3b82f6; border-bottom-color: #3b82f6; }
+.key-display { background: #0f172a; padding: 0.6rem; border-radius: 6px; font-family: monospace; font-size: 0.85rem; word-break: break-all; border: 1px solid #334155; margin: 0.5rem 0; }
+pre { background: #0f172a; padding: 0.8rem; border-radius: 6px; overflow-x: auto; font-size: 0.8rem; border: 1px solid #334155; max-height: 400px; overflow-y: auto; }
+.badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 999px; font-size: 0.75rem; font-weight: 500; }
+.badge-green { background: #22c55e20; color: #22c55e; border: 1px solid #22c55e40; }
+.badge-red { background: #ef444420; color: #ef4444; border: 1px solid #ef444440; }
+.response-box { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 0.8rem; margin-top: 0.5rem; max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 0.8rem; white-space: pre-wrap; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 0.3rem; }
+.status-dot.up { background: #22c55e; }
+.status-dot.down { background: #ef4444; }
+.section-title { font-size: 0.9rem; font-weight: 600; color: #cbd5e1; margin-bottom: 0.75rem; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner { width: 16px; height: 16px; border: 2px solid #334155; border-top-color: #3b82f6; border-radius: 50%; animation: spin 0.6s linear infinite; display: inline-block; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="flex justify-between mb-2">
+  <div>
+    <h1>AI API Platform</h1>
+    <h2 id="subtitle">Loading...</h2>
+  </div>
+  <div class="flex" style="gap:0.75rem">
+    <div id="statusBadge"><span class="status-dot up"></span><span class="text-sm text-green">Online</span></div>
+    <button class="btn-outline btn-sm" onclick="location.reload()">Refresh</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('overview',this)">Overview</div>
+  <div class="tab" onclick="switchTab('keys',this)">API Keys</div>
+  <div class="tab" onclick="switchTab('playground',this)">Playground</div>
+  <div class="tab" onclick="switchTab('info',this)">Connection Info</div>
+</div>
+
+<div id="tab-overview">
+  <div class="grid mb-2" id="statsGrid">
+    <div class="stat"><div class="stat-value" id="statRequests">-</div><div class="stat-label">Total Requests</div></div>
+    <div class="stat"><div class="stat-value" id="statModels">-</div><div class="stat-label">Models</div></div>
+    <div class="stat"><div class="stat-value" id="statUptime">-</div><div class="stat-label">Uptime</div></div>
+    <div class="stat stat-green"><div class="stat-value" id="statStatus">-</div><div class="stat-label">LM Studio</div></div>
+  </div>
+
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="card">
+      <div class="section-title">System</div>
+      <div id="systemInfo"><div class="spinner"></div> Loading...</div>
+    </div>
+    <div class="card">
+      <div class="section-title">Models</div>
+      <div id="modelsList"><div class="spinner"></div> Loading...</div>
+    </div>
+  </div>
+</div>
+
+<div id="tab-keys" class="hidden">
+  <div class="card mb-1">
+    <div class="flex justify-between mb-1">
+      <div class="section-title" style="margin:0">Your API Keys</div>
+      <button class="btn-success btn-sm" onclick="createKey()">+ New Key</button>
+    </div>
+    <div id="keyList"><p class="text-sm text-muted">Login to manage keys</p></div>
+    <div id="newKeyResult" class="hidden mt-1">
+      <p class="text-sm text-green">Save this key - it won't be shown again!</p>
+      <div class="key-display" id="newKeyValue"></div>
+      <button class="btn-sm btn-primary mt-1" onclick="copyKey()">Copy</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="flex justify-between mb-1">
+      <div style="margin:0" class="section-title">Account</div>
+      <div class="flex">
+        <span class="tab active" id="tabLogin" onclick="switchAuth('login')">Login</span>
+        <span class="tab" id="tabRegister" onclick="switchAuth('register')">Register</span>
+      </div>
+    </div>
+    <div id="loginForm">
+      <input type="email" id="loginEmail" placeholder="Email" value="admin@example.com">
+      <input type="password" id="loginPassword" placeholder="Password" value="changeme123">
+      <button class="btn-primary" onclick="login()">Login</button>
+    </div>
+    <div id="registerForm" class="hidden">
+      <input type="text" id="regName" placeholder="Name">
+      <input type="email" id="regEmail" placeholder="Email">
+      <input type="password" id="regPassword" placeholder="Password">
+      <button class="btn-success" onclick="register()">Register</button>
+    </div>
+    <div id="authStatus" class="mt-1 hidden"></div>
+  </div>
+</div>
+
+<div id="tab-playground" class="hidden">
+  <div class="card">
+    <div class="flex gap-1 mb-1">
+      <input type="text" id="pgKey" placeholder="API Key (sk_live_...)" class="grow" style="margin-bottom:0">
+      <select id="pgModel" style="width:auto;margin-bottom:0"></select>
+    </div>
+    <textarea id="pgPrompt" rows="4" placeholder="Enter your prompt...">Hello! What can you do?</textarea>
+    <div class="flex justify-between mt-1">
+      <div class="flex">
+        <input type="number" id="pgMaxTokens" placeholder="Max tokens" value="512" style="width:100px">
+        <input type="number" id="pgTemp" placeholder="Temp" value="0.7" step="0.1" min="0" max="2" style="width:80px">
+      </div>
+      <button class="btn-primary" onclick="sendChat()">Send</button>
+    </div>
+    <div id="pgResult" class="response-box hidden mt-1"></div>
+  </div>
+</div>
+
+<div id="tab-info" class="hidden">
+  <div class="card mb-1">
+    <div class="section-title">Connection Details</div>
+    <div class="key-display" style="font-size:0.9rem">
+      <div class="flex justify-between"><span class="text-muted">Base URL:</span> <span id="infoUrl">http://localhost:8000</span></div>
+      <div class="flex justify-between mt-1"><span class="text-muted">API Key:</span> <span id="infoKey">sk_live_your_api_key</span></div>
+      <div class="flex justify-between mt-1"><span class="text-muted">Models:</span> <span id="infoModels">-</span></div>
+    </div>
+    <button class="btn-sm btn-primary mt-1" onclick="copyInfo()">Copy Connection Info</button>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Usage Examples</div>
+    <pre id="codeExamples">Loading...</pre>
+  </div>
+</div>
+
+</div>
+
+<script>
+let BASE = window.location.origin;
+let JWT = '';
+let MODELS = [];
+
+async function api(method, path, body, token) {
+  const h = { 'Content-Type': 'application/json' };
+  if (token) h['Authorization'] = `Bearer ${token}`;
+  const r = await fetch(`${BASE}${path}`, { method, headers: h, body: body ? JSON.stringify(body) : undefined });
+  if (r.status === 204) return {};
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.detail || d.error?.message || JSON.stringify(d));
+  return d;
+}
+
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('[id^="tab-"]').forEach(t => t.classList.add('hidden'));
+  document.getElementById('tab-' + name).classList.remove('hidden');
+  if (name === 'overview') loadOverview();
+  if (name === 'keys') loadKeys();
+  if (name === 'playground') loadPlayground();
+  if (name === 'info') loadInfo();
+}
+
+function switchAuth(tab) {
+  document.getElementById('tabLogin').className = tab === 'login' ? 'tab active' : 'tab';
+  document.getElementById('tabRegister').className = tab === 'register' ? 'tab active' : 'tab';
+  document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+}
+
+async function loadOverview() {
+  try {
+    const h = await api('GET', '/health');
+    document.getElementById('subtitle').textContent = `v${h.version} | DB: ${h.database} | LM: ${h.lm_studio}`;
+    const up = Math.floor(h.uptime_seconds);
+    const d = Math.floor(up / 86400), hr = Math.floor((up % 86400) / 3600), m = Math.floor((up % 3600) / 60);
+    document.getElementById('statUptime').textContent = d > 0 ? `${d}d ${hr}h` : `${hr}h ${m}m`;
+    document.getElementById('statStatus').textContent = h.lm_studio === 'connected' ? 'Online' : 'Offline';
+    document.getElementById('statStatus').parentElement.className = h.lm_studio === 'connected' ? 'stat stat-green' : 'stat';
+    document.getElementById('statusBadge').innerHTML = `<span class="status-dot up"></span><span class="text-sm text-green">v${h.version}</span>`;
+  } catch (e) {
+    document.getElementById('subtitle').textContent = 'Offline';
+  }
+
+  try {
+    const m = await api('GET', '/dashboard/metrics');
+    document.getElementById('statRequests').textContent = m.total_requests || 0;
+    document.getElementById('statModels').textContent = m.models_available || 0;
+  } catch (e) {}
+
+  try {
+    const sys = await api('GET', '/dashboard/system');
+    document.getElementById('systemInfo').innerHTML = `
+      <div class="text-sm">CPU: ${sys.cpu_percent?.toFixed(1) || '-'}%</div>
+      <div class="text-sm mt-1">Memory: ${(sys.memory_used_mb / 1024).toFixed(1)}GB / ${(sys.memory_total_mb / 1024).toFixed(1)}GB (${sys.memory_percent?.toFixed(1)}%)</div>
+      <div class="text-sm mt-1">Disk: ${sys.disk_percent?.toFixed(1)}%</div>
+      <div class="text-sm mt-1">GPU: ${sys.gpu?.available ? sys.gpu.name || 'Available' : 'N/A'}</div>
+    `;
+  } catch (e) {
+    document.getElementById('systemInfo').innerHTML = '<span class="text-sm text-muted">Login to view</span>';
+  }
+
+  try {
+    const mods = await api('GET', '/v1/models');
+    MODELS = mods.data || [];
+    document.getElementById('modelsList').innerHTML = MODELS.map(m =>
+      `<div class="flex justify-between text-sm" style="padding:0.3rem 0;border-bottom:1px solid #1e293b">
+        <span>${m.id}</span>
+        <span class="badge badge-green">active</span>
+      </div>`
+    ).join('') || '<span class="text-sm text-muted">No models</span>';
+  } catch (e) {
+    document.getElementById('modelsList').innerHTML = '<span class="text-sm text-muted">No models</span>';
+  }
+}
+
+async function login() {
+  try {
+    const d = await api('POST', '/auth/login', { email: document.getElementById('loginEmail').value, password: document.getElementById('loginPassword').value });
+    JWT = d.access_token;
+    document.getElementById('authStatus').className = 'mt-1 text-green';
+    document.getElementById('authStatus').textContent = 'Logged in!';
+    loadKeys();
+  } catch (e) {
+    document.getElementById('authStatus').className = 'mt-1 text-red';
+    document.getElementById('authStatus').textContent = e.message;
+  }
+  document.getElementById('authStatus').classList.remove('hidden');
+}
+
+async function register() {
+  try {
+    await api('POST', '/auth/register', { name: document.getElementById('regName').value, email: document.getElementById('regEmail').value, password: document.getElementById('regPassword').value });
+    document.getElementById('authStatus').className = 'mt-1 text-green';
+    document.getElementById('authStatus').textContent = 'Registered! Login now.';
+  } catch (e) {
+    document.getElementById('authStatus').className = 'mt-1 text-red';
+    document.getElementById('authStatus').textContent = e.message;
+  }
+  document.getElementById('authStatus').classList.remove('hidden');
+}
+
+async function loadKeys() {
+  if (!JWT) return;
+  try {
+    const d = await api('GET', '/auth/api-keys', null, JWT);
+    const list = document.getElementById('keyList');
+    if (!d.items?.length) {
+      list.innerHTML = '<p class="text-sm text-muted">No keys. Create one!</p>';
+    } else {
+      list.innerHTML = d.items.map(k => `
+        <div class="flex justify-between" style="padding:0.5rem;background:#0f172a;border-radius:6px;margin-bottom:0.3rem">
+          <div class="flex" style="gap:0.75rem">
+            <div>
+              <strong>${k.name || 'unnamed'}</strong>
+              <div class="text-xs text-muted">${k.key_prefix}...</div>
+            </div>
+            <span class="badge ${k.is_active ? 'badge-green' : 'badge-red'}">${k.is_active ? 'active' : 'inactive'}</span>
+          </div>
+          <button class="btn-danger btn-sm" onclick="deleteKey('${k.id}')">Delete</button>
+        </div>
+      `).join('');
+    }
+  } catch (e) {
+    document.getElementById('keyList').innerHTML = `<p class="text-sm text-red">${e.message}</p>`;
+  }
+}
+
+async function createKey() {
+  if (!JWT) return alert('Login first');
+  try {
+    const d = await api('POST', '/auth/api-keys', { name: 'dashboard-key' }, JWT);
+    document.getElementById('newKeyResult').classList.remove('hidden');
+    document.getElementById('newKeyValue').textContent = d.raw_key;
+    loadKeys();
+  } catch (e) { alert(e.message); }
+}
+
+function copyKey() {
+  navigator.clipboard.writeText(document.getElementById('newKeyValue').textContent).then(() => alert('Copied!'));
+}
+
+async function deleteKey(id) {
+  if (!confirm('Delete this key?')) return;
+  try { await api('DELETE', `/auth/api-keys/${id}`, null, JWT); loadKeys(); }
+  catch (e) { alert(e.message); }
+}
+
+async function loadPlayground() {
+  try {
+    const mods = await api('GET', '/v1/models');
+    MODELS = mods.data || [];
+    const sel = document.getElementById('pgModel');
+    sel.innerHTML = MODELS.map(m => `<option value="${m.id}">${m.id}</option>`).join('');
+  } catch (e) {}
+}
+
+async function sendChat() {
+  const key = document.getElementById('pgKey').value;
+  const model = document.getElementById('pgModel').value;
+  const prompt = document.getElementById('pgPrompt').value;
+  const maxTokens = parseInt(document.getElementById('pgMaxTokens').value) || 512;
+  const temp = parseFloat(document.getElementById('pgTemp').value) || 0.7;
+  const result = document.getElementById('pgResult');
+  result.classList.remove('hidden');
+  result.innerHTML = '<div class="spinner"></div> Sending...';
+  try {
+    const r = await fetch(`${BASE}/v1/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+      body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }], max_tokens: maxTokens, temperature: temp })
+    });
+    const d = await r.json();
+    result.textContent = JSON.stringify(d, null, 2);
+  } catch (e) {
+    result.textContent = `Error: ${e.message}`;
+  }
+}
+
+function loadInfo() {
+  document.getElementById('infoModels').textContent = MODELS.map(m => m.id).join(', ') || 'Loading...';
+  const examples = `# Python
+from openai import OpenAI
+client = OpenAI(
+    base_url="${BASE}/v1",
+    api_key="sk_live_your_api_key"
+)
+r = client.chat.completions.create(
+    model="deepseek-coder-v2-lite-instruct",
+    messages=[{"role":"user","content":"hi"}]
+)
+print(r.choices[0].message.content)
+
+# curl
+curl -k -X POST "${BASE}/v1/chat/completions" \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer sk_live_your_api_key" \\
+  -d '{"model":"deepseek-coder-v2-lite-instruct","messages":[{"role":"user","content":"hi"}]}'
+
+# Roo Code / Cursor / Any IDE
+# Base URL: ${BASE}
+# API Key: sk_live_your_api_key
+# Model: deepseek-coder-v2-lite-instruct`;
+  document.getElementById('codeExamples').textContent = examples;
+}
+
+function copyInfo() {
+  const text = `URL: ${BASE}
+Key: sk_live_your_api_key
+Model: deepseek-coder-v2-lite-instruct`;
+  navigator.clipboard.writeText(text).then(() => alert('Copied!'));
+}
+
+loadOverview();
+</script>
+</body>
+</html>
