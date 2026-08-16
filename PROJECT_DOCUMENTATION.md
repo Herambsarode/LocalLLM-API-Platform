@@ -6,7 +6,7 @@ AI API Platform is a self-hosted, OpenAI-compatible API gateway for large langua
 
 The platform combines local model inference with authentication, user administration, rate limiting, quota enforcement, usage analytics, billing-ready records, health monitoring, and a lightweight web dashboard.
 
-**Developed by Heramb Sarode and Shruti Bhavsar.**
+Developed by [Heramb Sarode](https://github.com/Herambsarode) and [Shruti Bhavsar](https://github.com/Shrutibhavsar3240).
 
 ## 2. Goals
 
@@ -418,8 +418,8 @@ The public endpoint is offline. Restart the ngrok agent with `ngrok http 8000`.
 
 ## 20. Contributors
 
-- **Heramb Sarode**
-- **Shruti Bhavsar**
+- [Heramb Sarode](https://github.com/Herambsarode)
+- [Shruti Bhavsar](https://github.com/Shrutibhavsar3240)
 
 ## 21. License
 

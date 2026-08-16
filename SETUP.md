@@ -1,6 +1,6 @@
 # AI API Platform — Complete Setup Guide
 
-हा project **Heramb Sarode** आणि **Shruti Bhavsar** यांनी विकसित केला आहे. या guideमध्ये local API, PostgreSQL, LM Studio आणि ngrok tunnel setup दिला आहे.
+हा project [Heramb Sarode](https://github.com/Herambsarode) आणि [Shruti Bhavsar](https://github.com/Shrutibhavsar3240) यांनी विकसित केला आहे. या guideमध्ये local API, PostgreSQL, LM Studio आणि ngrok tunnel setup दिला आहे.
 
 ## 1. आवश्यक software
 

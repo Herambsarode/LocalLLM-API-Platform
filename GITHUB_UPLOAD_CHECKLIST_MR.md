@@ -1,6 +1,6 @@
 # GitHub Upload करण्यापूर्वीची Checklist
 
-हा **AI API Platform** project **Heramb Sarode** आणि **Shruti Bhavsar** यांनी विकसित केला आहे.
+हा **AI API Platform** project [Heramb Sarode](https://github.com/Herambsarode) आणि [Shruti Bhavsar](https://github.com/Shrutibhavsar3240) यांनी विकसित केला आहे.
 
 ## या project मधून public GitHub repository मध्ये upload करू नयेत अशा गोष्टी
 

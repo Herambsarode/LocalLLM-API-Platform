@@ -2,7 +2,7 @@
 
 A production-ready, OpenAI-compatible API platform for self-hosted LLMs via LM Studio.
 
-Developed by **Heramb Sarode** and **Shruti Bhavsar**.
+Developed by [Heramb Sarode](https://github.com/Herambsarode) and [Shruti Bhavsar](https://github.com/Shrutibhavsar3240).
 
 ## Why This Project Matters
 
@@ -118,5 +118,5 @@ Never commit `.env`, `ngrok.yml`, `API_INFO.txt`, API keys, access tokens, datab
 
 ## Contributors
 
-- Heramb Sarode
-- Shruti Bhavsar
+- [Heramb Sarode](https://github.com/Herambsarode)
+- [Shruti Bhavsar](https://github.com/Shrutibhavsar3240)
